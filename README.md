@@ -1,4 +1,4 @@
-# ShareX Infinite
+# ShareX Discord Storage
 
 > Virtually ♾️ file storage using discord!
 
@@ -16,4 +16,14 @@
 4. Clone this repository
 5. Run `npm install` to install packages
 6. Run `npm run start` or `npm run test` to run or test the server and bot
-7.
+
+## Configuring ShareX
+
+Use these Settings for your custom file uploader:
+| Setting | Value |
+-----------------|-------------
+|Destination Type | "File Uploader" |
+|Method | POST |
+|Request URL | yourhost.com/upload
+|Headers | "Authorization: your upload password" |
+|File form name | "file" |
