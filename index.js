@@ -70,10 +70,10 @@ app.post("/upload", async (req, res) => {
 
   let url = await sendFile(file);
 
-  return res.send(req.get("host") + "/download/" + url);
+  return res.send("http://" + req.get("host") + "/f/" + url);
 });
 
-app.get("/download/:id", async (req, res) => {
+app.get("/f/:id", async (req, res) => {
   const channel = await client.channels.fetch(process.env.BOT_CHANNEL_ID);
   const messages = await channel.messages.fetch({ limit: 100 });
   const chunksArray = [];
