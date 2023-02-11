@@ -13,6 +13,7 @@
    - BOT_CHANNEL_ID (the channel id of your created server channel)
    - UPLOAD_PASSWORD (a password to so only you can upload files, leave empty for no password)
    - USE_EMOJIS (set to true to use emojis in your image url)
+   - URL_ID_LENGTH (length of the resulting url id, defaults to 6)
 
 4. Clone this repository
 5. Run `npm install` to install packages

@@ -36,7 +36,10 @@ async function sendFile(file) {
   for (let i = 0; i < chunkCount; i++) {
     const chunk = file.data.slice(i * CHUNK_SIZE, (i + 1) * CHUNK_SIZE);
 
-    const filenameArr = getRandomValue(emojiToChar, 6);
+    const filenameArr = getRandomValue(
+      emojiToChar,
+      process.env.URL_ID_LENGTH || 6
+    );
     var filename;
 
     if (process.env.USE_EMOJIS) {
