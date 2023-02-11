@@ -92,7 +92,9 @@ app.post("/upload", async (req, res) => {
   const file = req.files.file;
 
   let url = await sendFile(file);
-
+  console.log(
+    "Download link generated: http://" + req.get("host") + "/i/" + url
+  );
   return res.send("http://" + req.get("host") + "/i/" + url);
 });
 
