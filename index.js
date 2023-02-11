@@ -6,6 +6,15 @@ const express = require("express");
 const fileUpload = require("express-fileupload");
 
 const { Client, GatewayIntentBits, Attachment } = require("discord.js");
+
+const {
+  emojiToChar,
+  charToEmoji,
+  getCorrespondingElement,
+  getRandomValue,
+  splitEmojiString,
+} = require("./emoji");
+
 /*
 DISCORD BOT
 */
@@ -17,6 +26,7 @@ const client = new Client({
 const CHUNK_SIZE = 8 * 1024 * 1024; // 8 MB
 
 async function sendFile(file) {
+  console.log("--- New file upload");
   const chunkCount = Math.ceil(file.data.length / CHUNK_SIZE);
 
   const channel = await client.channels.fetch(process.env.BOT_CHANNEL_ID);
@@ -26,20 +36,33 @@ async function sendFile(file) {
   for (let i = 0; i < chunkCount; i++) {
     const chunk = file.data.slice(i * CHUNK_SIZE, (i + 1) * CHUNK_SIZE);
 
+    const filenameArr = getRandomValue(emojiToChar, 6);
+    var filename;
+
+    if (process.env.USE_EMOJIS) {
+      filename = filenameArr.map((char) => {
+        return getCorrespondingElement(charToEmoji, char);
+      });
+    } else {
+      filename = filenameArr;
+    }
+
+    filename = filename.join("");
+
     console.log("Sending chunk " + i);
     //let attachment = new Attachment(chunk, file.md5 + ".chunk");
     channel.send({
-      content: `${file.md5}.${fileExt}-${i}`,
+      content: `${filenameArr.join("")}.${fileExt}-${i}`,
       files: [
         {
           attachment: chunk,
-          name: `${file.md5}.${fileExt}-${i}`,
+          name: `${filenameArr.join("")}.${fileExt}-${i}`,
           description: "Chunk file",
         },
       ],
     });
   }
-  return `${file.md5}.${fileExt}`;
+  return `${filename}.${fileExt}`;
 }
 
 function runBot() {
@@ -70,16 +93,29 @@ app.post("/upload", async (req, res) => {
 
   let url = await sendFile(file);
 
-  return res.send("http://" + req.get("host") + "/f/" + url);
+  return res.send("http://" + req.get("host") + "/i/" + url);
 });
 
-app.get("/f/:id", async (req, res) => {
+app.get("/i/:id", async (req, res) => {
   const channel = await client.channels.fetch(process.env.BOT_CHANNEL_ID);
   const messages = await channel.messages.fetch({ limit: 100 });
   const chunksArray = [];
 
+  var filename = req.params.id;
+  if (process.env.USE_EMOJIS) {
+    filename = req.params.id.split(".").shift();
+    filename = splitEmojiString(filename)
+      .map((emoji) => {
+        return emojiToChar[emoji];
+      })
+      .join("");
+    filename += "." + req.params.id.split(".").pop();
+  }
+
+  console.log(filename);
+
   for (let i = 0; ; i++) {
-    const message = messages.find((m) => m.content === `${req.params.id}-${i}`);
+    const message = messages.find((m) => m.content === `${filename}-${i}`);
     if (!message) break;
     const response = await axios.get(message.attachments.first().url, {
       responseType: "arraybuffer",
